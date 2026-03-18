@@ -28,8 +28,9 @@ if args.inplace and args.output is not None:
     parser.error("The flags -o and -i cannot be used simultaneously")
     exit(1)
 
+# if no output path given (and not editing in-place), then preview instead
+preview = False
 if not args.inplace and args.output is None:
-    # if no output path given (and not editing in-place), then preview instead
     preview = True
 
 # attempt to read input image
@@ -50,6 +51,11 @@ if preview:
 
 # output image to args.output if given, or args.input if not (i.e. if -i was
 # specified)
-img.save(args.output or args.input)
+outpath = args.output or args.input
+try:
+    img.save(outpath)
+except Exception as e:
+    print(f"Error when saving image to {outpath}: {e}")
+    exit(3)
 
 img.close()
