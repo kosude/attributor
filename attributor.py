@@ -39,6 +39,12 @@ parser.add_argument("-s",
                          "image width)",
                     dest="fontsize",
                     default="20%")
+parser.add_argument("-p",
+                    type=str,
+                    help="text position (defaults to tr i.e. top-right)",
+                    choices=["tl", "tr", "bl", "br"],
+                    dest="pos",
+                    default="tr")
 args = parser.parse_args()
 
 # validate arguments
@@ -118,18 +124,40 @@ match fontspec_unit:
             if _wid >= _fontprop * _imgwid:
                 break
 
+    # any other unit suffix
     case _:
         print(f"Invalid unit \"{fontspec_unit}\" specified in font size " \
               f"argument \"{args.fontsize}\"")
         exit(1)
 
 # load the font at the final size
-# yes, this is unnecessary when percentage units given, but it isn't too
-# expensive soo oh well!
+# (yes, this is unnecessary when percentage units given, but it isn't too
+# expensive and this program isn't optimally fast anyway soo oh well!)
 font = ImageFont.truetype(fontpath, fontsize)
 
-draw.text((0, 0), text, font=font,
-          stroke_width=fontsize*0.05, stroke_fill="black")
+strokewid = fontsize * 0.05
+strokecol = "black"
+
+bbox = draw.multiline_textbbox((0, 0), text, font)
+txtwid = bbox[2] - bbox[0]
+txthei = (bbox[3] - bbox[1]) * 1.4 # some extra height needed for some reason
+
+# compute text position
+xy = (0, 0)
+match args.pos:
+    case "tl":
+        ...
+    case "tr":
+        xy = (img.width - txtwid,
+              0)
+    case "bl":
+        xy = (0,
+              img.height - txthei)
+    case "br":
+        xy = (img.width - txtwid,
+              img.height - txthei)
+
+draw.text(xy, text, font=font, stroke_width=strokewid, stroke_fill=strokecol)
 
 # if just previewing the output, then show the image and exit cleanly
 if preview:
