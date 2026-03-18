@@ -21,6 +21,12 @@ parser.add_argument("-i",
                     action="store_true",
                     help="edit the image in-place",
                     dest="inplace")
+parser.add_argument("-f",
+                    type=str,
+                    help="set the font used for added text",
+                    choices=["dos"],
+                    dest="font",
+                    default="dos")
 args = parser.parse_args()
 
 # validate conditionally required arguments
@@ -33,6 +39,9 @@ preview = False
 if not args.inplace and args.output is None:
     preview = True
 
+basepath = os.path.dirname(os.path.realpath(__file__))
+fontpath = os.path.join(basepath, "fonts", f"{args.font}.ttf")
+
 # attempt to read input image
 try:
     img = Image.open(args.input, "r")
@@ -40,8 +49,12 @@ except Exception as e:
     print(f"Error when loading image at {args.input}: {e}")
     exit(2)
 
+font = ImageFont.truetype(fontpath, 30)
+
 # draw text to image
-ImageDraw.Draw(img).text((0, 0), "Hello world", (0, 0, 0))
+draw = ImageDraw.Draw(img)
+
+draw.text((0, 0), "jerma985", font=font)
 
 # if just previewing the output, then show the image and exit cleanly
 if preview:
