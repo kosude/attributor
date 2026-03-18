@@ -35,10 +35,10 @@ parser.add_argument("-f",
                     default="dos")
 parser.add_argument("-s",
                     type=str,
-                    help="specify the font size (defaults to 30%% of the " \
+                    help="specify the font size (defaults to 20%% of the " \
                          "image width)",
                     dest="fontsize",
-                    default="30%")
+                    default="20%")
 args = parser.parse_args()
 
 # validate arguments
