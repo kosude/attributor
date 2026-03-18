@@ -128,7 +128,8 @@ match fontspec_unit:
 # expensive soo oh well!
 font = ImageFont.truetype(fontpath, fontsize)
 
-draw.text((0, 0), text, font=font)
+draw.text((0, 0), text, font=font,
+          stroke_width=fontsize*0.05, stroke_fill="black")
 
 # if just previewing the output, then show the image and exit cleanly
 if preview:
