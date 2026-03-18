@@ -15,6 +15,10 @@ parser = argparse.ArgumentParser()
 parser.add_argument("input",
                     type=str,
                     help="path to the input image")
+parser.add_argument("line",
+                    type=str,
+                    help="line of text to add",
+                    nargs="+")
 parser.add_argument("-o",
                     type=str,
                     help="path to the output image",
@@ -56,9 +60,10 @@ try:
 except Exception as e:
     print(f"Error when loading image at {args.input}: {e}")
     exit(2)
+draw = ImageDraw.Draw(img)
 
-# TODO take text input
-text = "testtext"
+# form text block from specified lines
+text = "\n".join(args.line)
 
 # get the input font size as formatted
 fontspec_size = 0
@@ -87,11 +92,11 @@ match fontspec_unit:
     case "pt":
         fontsize = fontspec_size
 
-    # percentage fontsize taken to be a proportion of the image size
+    # percentage fontsize taken to be a proportion of the image width
     case "%":
         _fontprop = fontspec_size * 0.01 # convert percentage to decimal
 
-        # get the font size based on proportion of the image to take up
+        # get the font size based on proportion of the image width to take up
         # a method courtesy of Paul on SO:
         # https://stackoverflow.com/a/4902713/12980669
         _imgwid = img.size[0]
@@ -106,8 +111,8 @@ match fontspec_unit:
                 exit(4)
 
             # get width of rendered text
-            _l, _, _r, _ = font.getbbox(text)
-            _wid = _r - _l
+            _bbox = draw.multiline_textbbox((0, 0), text, font)
+            _wid = _bbox[2] - _bbox[0] # right - left
 
             # repeat with incrementing fontsize until the text is big enough
             if _wid >= _fontprop * _imgwid:
@@ -122,9 +127,6 @@ match fontspec_unit:
 # yes, this is unnecessary when percentage units given, but it isn't too
 # expensive soo oh well!
 font = ImageFont.truetype(fontpath, fontsize)
-
-# draw text to image
-draw = ImageDraw.Draw(img)
 
 draw.text((0, 0), text, font=font)
 
