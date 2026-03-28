@@ -5,3 +5,7 @@ venv/
 .vscode/
 
 .DS_Store
+
+# this is a symlink I use in the root directory, but I'm sure ignoring a file
+# with this name couldn't cause any problems in a project called "attributor".
+/attributor
